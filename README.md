@@ -6,7 +6,7 @@ https://coinmarketcap.com/ web scraper
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### run script
 ```
 node scraper.js
 ```

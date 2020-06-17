@@ -37,7 +37,7 @@ axios.get('https://coinmarketcap.com/').then((res) => {
             if(el == "Price") fs.appendFileSync('coin-titles.txt', el + ' ', function(err) {if (err) console.log(err);});
             if(el == "Change (24h)") fs.appendFileSync('coin-titles.txt', el + ' ', function(err) {if (err) console.log(err);});
         })
-
+        
         finalShownCoins.forEach(el => {
             fs.appendFileSync('coin-titles.txt', '\n' + el.Rank + ' ' + el.Name + ' ' + el.Price + ' ' + el['Change (24h)'] + ',', function(err) {if (err) console.log(err);});
         })

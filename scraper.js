@@ -42,8 +42,8 @@ axios.get('https://coinmarketcap.com/').then((res) => {
             fs.appendFileSync('coin-titles.txt', '\n' + el.Rank + ' ' + el.Name + ' ' + el.Price + ' ' + el['Change (24h)'] + ',', function(err) {if (err) console.log(err);});
         })
     }
-    saveData();
-    })
-    .catch(err => {
-        console.log(err)
-    })
+        saveData();
+        })
+        .catch(err => {
+            console.log(err)
+        })

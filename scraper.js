@@ -19,23 +19,30 @@ axios.get('https://coinmarketcap.com/').then((res) => {
     // Looping through column content for each coin
     //using number to get the top 10. If you want to get all, change to coinInformation.length
     let finalObject = {};
-    for(let i = 0; i < 5; i++) {
+    let topCoinsIWantToSee = 20;
+    for(let i = 0; i < topCoinsIWantToSee; i++) {
         const coinContent = coinInformation.eq([i]).find('td');
         let finalObject = {};
 
         coinTitleArray.forEach((el, j) => { finalObject[el] = coinContent.eq([j]).text();})
         finalShownCoins.push(finalObject);
     }
-    
-    // adding data to a .json file
-    function prettyData(arr) {
-        fs.writeFile('coin-titles.json', '', function(err) {if (err) console.log(err);});
-        arr.forEach(el => {
-            let stringify = JSON.stringify(el);
-            fs.appendFileSync('coin-titles.json', stringify + '\n', function(err) {if (err) console.log(err);});
+
+    function saveData() {
+        fs.writeFile('coin-titles.txt', '', function(err) {if (err) console.log(err);});
+        
+        coinTitleArray.forEach(el => {
+            if(el == "Rank") fs.appendFileSync('coin-titles.txt', el + ' ', function(err) {if (err) console.log(err);});
+            if(el == "Name") fs.appendFileSync('coin-titles.txt', el + ' ', function(err) {if (err) console.log(err);});
+            if(el == "Price") fs.appendFileSync('coin-titles.txt', el + ' ', function(err) {if (err) console.log(err);});
+            if(el == "Change (24h)") fs.appendFileSync('coin-titles.txt', el + ' ', function(err) {if (err) console.log(err);});
+        })
+
+        finalShownCoins.forEach(el => {
+            fs.appendFileSync('coin-titles.txt', '\n' + el.Rank + ' ' + el.Name + ' ' + el.Price + ' ' + el['Change (24h)'] + ',', function(err) {if (err) console.log(err);});
         })
     }
-    prettyData(finalShownCoins);
+    saveData();
 })
 .catch(err => {
     console.log(err)

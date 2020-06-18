@@ -17,7 +17,7 @@ require.extensions['.txt'] = function (module, filename) {
 };
 
 //////////////////////////////////////
-//      Twilio Send Text
+//      Twilio Send Text Message
 //////////////////////////////////////
 function sendTextMessage() {
     const msg = require(cryptoFileName);
@@ -47,8 +47,7 @@ axios.get('https://coinmarketcap.com/').then((res) => {
         coinTitleArray.push(title);
     }
 
-    // Looping through column content for each coin
-    //using number to get the top 10. If you want to get all, change to coinInformation.length
+    //using topCoins and for loop to get the top n crypto currencies.
     let topCoins = 20;
     for(let i = 0; i < topCoins; i++) {
         const coinContent = coinInformation.eq([i]).find('td');
@@ -58,6 +57,7 @@ axios.get('https://coinmarketcap.com/').then((res) => {
         finalShownCoins.push(coinsToShow);
     }
 
+    //creating/updating file to send text message
     function setUpData() {
         fs.writeFile(cryptoFileName, '', function(err) {if (err) console.log(err);});
         

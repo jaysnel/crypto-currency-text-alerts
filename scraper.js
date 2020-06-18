@@ -1,6 +1,18 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
+const accountSid = 'AC23accf08ab9a97b00a23d577bf21a7d3';
+const authToken = '24ed6f367c4887e3e99bef8d12b0da33';
+const client = require('twilio')(accountSid, authToken);
+
+client.messages
+  .create({
+     body: 'This is the ship that made the Kessel Run in fourteen parsecs?',
+     from: '+17043248153',
+     to: '+18106241057'
+   })
+  .then(message => console.log(message));
+
 
 axios.get('https://coinmarketcap.com/').then((res) => {
     const $ = cheerio.load(res.data);
@@ -42,8 +54,8 @@ axios.get('https://coinmarketcap.com/').then((res) => {
             fs.appendFileSync('coin-titles.txt', '\n' + el.Rank + ' ' + el.Name + ' ' + el.Price + ' ' + el['Change (24h)'] + ',', function(err) {if (err) console.log(err);});
         })
     }
-        saveData();
-        })
-        .catch(err => {
-            console.log(err)
-        })
+    saveData();
+    })
+    .catch(err => {
+        console.log(err)
+    })

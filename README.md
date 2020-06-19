@@ -1,5 +1,5 @@
-# coin-market-web-scraper
-https://coinmarketcap.com/ web scraper
+# crypto-currency-text-alerts
+text daily alerts for you favorite crypto currencies
 
 Using node and twilio
 

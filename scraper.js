@@ -1,11 +1,11 @@
 //////////////////////////////////////
-//      Variable Set Up
+//      Global variable Set Up
 //////////////////////////////////////
 const dotenv = require('dotenv');
 dotenv.config();
 const axios = require('axios');
-const cheerio = require('cheerio');
 const fs = require('fs');
+const coinMarketApiKey = process.env.COINMARKET_API_KEY;
 const twilioNumber = process.env.TWILIOPHONENUMBER;
 const phoneNumber = process.env.PHONENUMBER;
 const accountSid = process.env.ACCOUNTSID;
@@ -15,9 +15,15 @@ const cryptoFileName = './top-crypto-coins.txt';
 require.extensions['.txt'] = function (module, filename) {
     module.exports = fs.readFileSync(filename, 'utf8');
 };
+const myOwnedCoins = ['xrp','neo','eth']; //add coins by their symbol that you want to see in your alert
+let todaysdate = new Date();
+let dd = String(todaysdate.getDate()).padStart(2, '0');
+let mm = String(todaysdate.getMonth() + 1).padStart(2, '0'); //January is 0!
+let yyyy = todaysdate.getFullYear();
+todaysdate = mm + '/' + dd + '/' + yyyy;
 
 //////////////////////////////////////
-//      Twilio Send Text Message
+//      Twilio Send Text
 //////////////////////////////////////
 function sendTextMessage() {
     const msg = require(cryptoFileName);
@@ -27,47 +33,44 @@ function sendTextMessage() {
             from: twilioNumber,
             to: phoneNumber
         })
-        .then(message => console.log(message));
+        .then(message => {return message});
 }
 
 //////////////////////////////////////
-//      Web Scraper
+//      Getting data ready for text
 //////////////////////////////////////
-axios.get('https://coinmarketcap.com/').then((res) => {
-    const $ = cheerio.load(res.data);
-    const cryptoCategoryTitle = $('.sc-1yv6u5n-0 .cmc-table__table-wrapper-outer thead').last().find('tr th');
-    const cryptoCurrencyInformation = $('.sc-1yv6u5n-0 .cmc-table__table-wrapper-outer tbody').last().find('tr');
+let allCoins = null;
+let coinsToSend = [];
 
-    // Looping through column titles
-    let cryptoCategoryTitleArray = []; //controls how many catergories you want to show from the homepage
-    let finalShownCoins = [];
-
-    for(let i = 0; i <= cryptoCategoryTitle.length - 2; i++) { //populates cryptoCategoryTitleArray with the catergories you want to pull
-        const title = cryptoCategoryTitle.eq([i]).html();
-        cryptoCategoryTitleArray.push(title);
-    }
-
-    //using topCoins and for loop to get the top n crypto currencies.
-    let topCoins = 20;
-    for(let i = 0; i < topCoins; i++) {
-        const coinContent = cryptoCurrencyInformation.eq([i]).find('td');
-        let coinsToShow = {};
-
-        cryptoCategoryTitleArray.forEach((el, j) => { coinsToShow[el] = coinContent.eq([j]).text();})
-        finalShownCoins.push(coinsToShow);
-    }
-
-    //creating/updating file to send text message
-    function setUpData() {
-        fs.writeFile(cryptoFileName, '', function(err) {if (err) console.log(err);});
-
-        finalShownCoins.forEach(el => {
-            fs.appendFileSync(cryptoFileName, '\n' + el.Rank + ' ' + el.Name + ' ' + el.Price + ' ' + el['Change (24h)'] + ',' + '\n', function(err) {if (err) console.log(err);});
+function getCurrenciesIWant(coins) {
+    coins.forEach(el => {
+        myOwnedCoins.forEach(el2 => {
+            if(el2.toLowerCase() == el.symbol.toLowerCase()) coinsToSend.push(el);
         })
-        sendTextMessage();
-    }
-    setUpData();
     })
-    .catch(err => {
-        console.log(err)
+    formatData();
+}
+
+function formatData() {
+    fs.writeFileSync(cryptoFileName, todaysdate);
+    coinsToSend.forEach(el => {
+        fs.appendFileSync(cryptoFileName, '\n' + `${el.cmc_rank} ${el.symbol} $${el.quote.USD.price.toFixed(2)} ${el.quote.USD.percent_change_24h.toFixed(2)}%`);
     })
+    sendTextMessage();
+}
+
+//////////////////////////////////////
+//      API call for coins
+//////////////////////////////////////
+axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest',
+{
+    headers: { 'X-CMC_PRO_API_KEY': coinMarketApiKey },
+    qs: {'start': '1', 'limit': '5000', 'convert': 'USD' },
+})
+.then((res) => {
+    allCoins = res.data.data;
+    getCurrenciesIWant(allCoins);
+})
+.catch((err) => {
+    console.log(err);
+});

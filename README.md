@@ -1,5 +1,5 @@
 # crypto-currency-text-alerts
-text daily alerts for you favorite crypto currencies
+Text daily alerts for your favorite crypto currencies
 
 Using node and twilio
 

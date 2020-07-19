@@ -23,7 +23,7 @@ let yyyy = todaysdate.getFullYear();
 todaysdate = mm + '/' + dd + '/' + yyyy;
 
 //////////////////////////////////////
-//      Twilio Send Text
+//      Twilio Send Text Message
 //////////////////////////////////////
 function sendTextMessage() {
     const msg = require(cryptoFileName);

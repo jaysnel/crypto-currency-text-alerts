@@ -15,7 +15,7 @@ const cryptoFileName = './top-crypto-coins.txt';
 require.extensions['.txt'] = function (module, filename) {
     module.exports = fs.readFileSync(filename, 'utf8');
 };
-const myOwnedCoins = ['xrp','trx','eth']; //add coins by their symbol that you want to see in your alert
+const myOwnedCoins = ['xrp','btc','eth']; //add coins by their symbol that you want to see in your alert
 let todaysdate = new Date();
 let dd = String(todaysdate.getDate()).padStart(2, '0');
 let mm = String(todaysdate.getMonth() + 1).padStart(2, '0'); //January is 0!

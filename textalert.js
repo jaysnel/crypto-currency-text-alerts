@@ -11,11 +11,8 @@ const phoneNumber = process.env.PHONENUMBER;
 const accountSid = process.env.ACCOUNTSID;
 const authToken = process.env.AUTHTOKEN;
 const client = require('twilio')(accountSid, authToken);
-const cryptoFileName = './top-crypto-coins.txt';
-require.extensions['.txt'] = function (module, filename) {
-    module.exports = fs.readFileSync(filename, 'utf8');
-};
 const myOwnedCoins = ['xrp','btc','eth']; //add coins by their symbol that you want to see in your alert
+let coinsToSend = [];
 let todaysdate = new Date();
 let dd = String(todaysdate.getDate()).padStart(2, '0');
 let mm = String(todaysdate.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -26,10 +23,14 @@ todaysdate = mm + '/' + dd + '/' + yyyy;
 //      Twilio Send Text Message
 //////////////////////////////////////
 function sendTextMessage() {
-    const msg = require(cryptoFileName);
+    let msg = [];
+    coinsToSend.forEach(el => {
+        msg.push(`${el.cmc_rank} ${el.symbol} $${el.quote.USD.price.toFixed(2)} ${el.quote.USD.percent_change_24h.toFixed(2)}%`);
+    })
+    let regex = new RegExp(",", "g");
     client.messages
         .create({
-            body: msg,
+            body: msg.toString().replace(regex, "\n"),
             from: twilioNumber,
             to: phoneNumber
         })
@@ -40,21 +41,12 @@ function sendTextMessage() {
 //      Getting data ready for text
 //////////////////////////////////////
 let allCoins = null;
-let coinsToSend = [];
 
 function getCurrenciesIWant(coins) {
     coins.forEach(el => {
         myOwnedCoins.forEach(el2 => {
             if(el2.toLowerCase() == el.symbol.toLowerCase()) coinsToSend.push(el);
         })
-    })
-    formatData();
-}
-
-function formatData() {
-    fs.writeFileSync(cryptoFileName, todaysdate);
-    coinsToSend.forEach(el => {
-        fs.appendFileSync(cryptoFileName, '\n' + `${el.cmc_rank} ${el.symbol} $${el.quote.USD.price.toFixed(2)} ${el.quote.USD.percent_change_24h.toFixed(2)}%`);
     })
     sendTextMessage();
 }

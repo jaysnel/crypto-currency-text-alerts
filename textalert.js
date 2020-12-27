@@ -17,6 +17,7 @@ let todaysdate = new Date();
 let dd = String(todaysdate.getDate()).padStart(2, '0');
 let mm = String(todaysdate.getMonth() + 1).padStart(2, '0'); //January is 0!
 let yyyy = todaysdate.getFullYear();
+let allCoins = null;
 todaysdate = mm + '/' + dd + '/' + yyyy;
 
 //////////////////////////////////////
@@ -40,8 +41,6 @@ function sendTextMessage() {
 //////////////////////////////////////
 //      Getting data ready for text
 //////////////////////////////////////
-let allCoins = null;
-
 function getCurrenciesIWant(coins) {
     coins.forEach(el => {
         myOwnedCoins.forEach(el2 => {
